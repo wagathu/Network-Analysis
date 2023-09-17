@@ -1,0 +1,79 @@
+---
+title: "Network Analysis"
+output:
+  html_document: default
+  pdf_document: default
+---
+<style>
+body {
+text-align: justify}
+</style>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+**Network Analysis** examines the relationship among entities, such as persons, organisations, or documents.
+It also shows the relationship amongst the entities and how they operate in relation to one another.
+If you are using any social media applications, you may have experienced the friend or follower suggestions 
+functions. Have you ever wondered how these functions work? One common technology used in these cases is Network Analysis.
+
+It consists of **Nodes** and **edges**. The nodes represent the objects on investigation while the edges represent the relationship 
+amongst them.
+A crucial application of network analysis is identifying the important node in a network. This task is called Measuring Network '
+Centrality. In social network analysis, it can refer to the task of identifying the most influential member, or the representative
+ of the group. In r it is done as follows;
+ 
+```{r}
+# Importing the Packages --------------------------------------------------
+
+library(pacman)
+p_load(visNetwork, igraph, RColorBrewer, dplyr, readxl)
+# Data from Kaggle --------------------------------------------------------
+
+setwd("E:/Desktop/Network Analysis")
+Inodes <- read.csv("InputFileNodes.csv")
+Iedges <- read.csv("InputFileEdges.csv")
+
+Inodes |> 
+  View()
+Iedges |> 
+  View()
+
+
+# Preparing the nodes -----------------------------------------------------
+
+colors <- colorRampPalette(brewer.pal(3, "OrRd"))(3)
+Inodes <- Inodes |> 
+  mutate(
+  shape = "dot",
+  shadow = TRUE,
+  title = type.label,
+  label = media,
+  size = 25,
+  borderwidth = 2,
+  color.background = colors[media.type],
+  color.highlight.background = "yellow",
+  color.highlight.border = "black"
+  )
+
+
+# Preparing the edges -----------------------------------------------------
+
+Iedges <- Iedges |> 
+  mutate(
+    arrows = "to",
+    color = "royalblue",
+    smooth = TRUE
+  )
+visNetwork(Inodes, Iedges, main = "The flow of News in different stations") |> 
+  visLayout(randomSeed = 5) |> 
+  visOptions(highlightNearest = TRUE,
+             manipulation = TRUE,
+             nodesIdSelection = FALSE) |> 
+  visLegend()
+```
+ 
+ 
+ 

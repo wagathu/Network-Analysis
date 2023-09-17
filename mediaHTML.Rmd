@@ -1,0 +1,66 @@
+---
+title: "Network Analysis"
+author: "B.M"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+# Importing the Packages --------------------------------------------------
+
+library(pacman)
+p_load(visNetwork, igraph, RColorBrewer, dplyr, readxl)
+# Data from Kaggle --------------------------------------------------------
+
+setwd("E:/Desktop/Network Analysis")
+Inodes <- read.csv("InputFileNodes.csv")
+Iedges <- read.csv("InputFileEdges.csv")
+
+Inodes |> 
+  View()
+Iedges |> 
+  View()
+
+
+# Preparing the nodes -----------------------------------------------------
+
+colors <- colorRampPalette(brewer.pal(3, "RdPu"))(3)
+Inodes <- Inodes |> 
+  mutate(
+  shape = "dot",
+  shadow = TRUE,
+  title = type.label,
+  label = media,
+  size = 25,
+  borderwidth = 2,
+  color.background = colors[media.type],
+  color.highlight.background = "yellow",
+  color.highlight.border = "black"
+  )
+
+
+# Preparing the edges -----------------------------------------------------
+
+Iedges <- Iedges |> 
+  mutate(
+    arrows = "to",
+    color = "royalblue",
+    smooth = TRUE
+  )
+j <- visNetwork(Inodes, Iedges, main = "The flow of News in different stations") |> 
+  visLayout(randomSeed = 5) |> 
+  visOptions(highlightNearest = TRUE,
+             manipulation = TRUE,
+             nodesIdSelection = FALSE) |> 
+  visLegend() |>
+  visInteraction(hideEdgesOnDrag = TRUE,
+                 dragNodes = TRUE,
+                 dragView = TRUE,
+                 navigationButtons = TRUE)
+
+```
+
